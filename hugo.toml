@@ -1,0 +1,4 @@
+baseURL = 'https://kumestra.github.io/'
+languageCode = 'en-us'
+title = 'Test Blog'
+theme = 'ananke'
