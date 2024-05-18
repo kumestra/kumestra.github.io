@@ -6,8 +6,15 @@
     <description>Recent content on Test Blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 14 Jan 2024 07:07:07 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 18 Apr 2024 07:07:07 +0100</lastBuildDate>
     <atom:link href="https://kumestra.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hugo Setup</title>
+      <link>https://kumestra.github.io/posts/hugo-setup/</link>
+      <pubDate>Thu, 18 Apr 2024 07:07:07 +0100</pubDate>
+      <guid>https://kumestra.github.io/posts/hugo-setup/</guid>
+      <description>Install Go Download Go.&#xA;wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz Decompress the file.&#xA;sudo tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz Add the following content to ~/.bashrc&#xA;export PATH=$PATH:/usr/local/go/bin Restart the shell, and verify if the installation is successful.&#xA;go version Install Dart Sass Download the Dart Sass.&#xA;wget https://github.com/sass/dart-sass/releases/download/1.77.1/dart-sass-1.77.1-linux-x64.tar.gz Decompress the file.&#xA;tar -xzf dart-sass-1.77.1-linux-x64.tar.gz Add excutable file to PATH.&#xA;export PATH=$PATH:/usr/local/dart-sass Verify the installation.&#xA;sass Install Hugo Download Hugo.&#xA;wget https://github.com/gohugoio/hugo/releases/download/v0.126.0/hugo_0.126.0_linux-amd64.tar.gz Add excutable file to PATH.</description>
+    </item>
     <item>
       <title>My First Post</title>
       <link>https://kumestra.github.io/posts/my-first-post/</link>
