@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://kumestra.github.io/posts/hugo-setup/</loc>
-    <lastmod>2024-04-18T07:07:07+01:00</lastmod>
+    <loc>https://kumestra.github.io/posts/langchain/</loc>
+    <lastmod>2024-05-14T07:07:07+01:00</lastmod>
   </url><url>
     <loc>https://kumestra.github.io/posts/</loc>
-    <lastmod>2024-04-18T07:07:07+01:00</lastmod>
+    <lastmod>2024-05-14T07:07:07+01:00</lastmod>
   </url><url>
     <loc>https://kumestra.github.io/</loc>
+    <lastmod>2024-05-14T07:07:07+01:00</lastmod>
+  </url><url>
+    <loc>https://kumestra.github.io/posts/hugo-setup/</loc>
     <lastmod>2024-04-18T07:07:07+01:00</lastmod>
   </url><url>
     <loc>https://kumestra.github.io/posts/my-first-post/</loc>
