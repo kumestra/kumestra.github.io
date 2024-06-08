@@ -1,10 +1,9 @@
 ---
-title: "test"
+title: "Computer Network"
 summary: Learn About All Features in PaperMod
-date: 2024-01-20
-weight: 2
-aliases: ["/papermod-features"]
-tags: ["PaperMod", "Docs"]
+date: 2024-06-07
+weight: 1
+tags: ["Computer Network"]
 author: ["Aditya Telange"]
 ---
 
