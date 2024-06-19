@@ -9,6 +9,85 @@ author: ["Evanara Kumestra"]
 
 这是我论文中的一段话，请你判断一下内容是否正确。
 
+那你帮我润色下，使它内容正确，用词精准，语句通顺。
+
+# Prompt Engineering
+
+https://learn.deeplearning.ai/courses/chatgpt-prompt-eng/
+
+## Prompting Principles
+
+### Principle 1: Write clear and specific instructions
+
+Use delimiters to clearly indicate distinct parts of the input. Delimiters can be anything like: ```, """, < >, &lt;tag> &lt;/tag>.
+
+使用分隔符来区分prompt中的不同的部分。
+
+```python {linenos=true}
+text = f"""
+You should express what you want a model to do by \
+providing instructions that are as clear and \
+specific as you can possibly make them. \
+This will guide the model towards the desired output, \
+and reduce the chances of receiving irrelevant \
+or incorrect responses. Don't confuse writing a \
+clear prompt with writing a short prompt. \
+In many cases, longer prompts provide more clarity \
+and context for the model, which can lead to \
+more detailed and relevant outputs.
+"""
+
+prompt = f"""
+Summarize the text delimited by triple backticks \
+into a single sentence.
+```{text}```
+"""
+```
+
+```text {linenos=true}
+Providing clear, specific, and detailed instructions in prompts helps guide a model to produce the desired output and reduces irrelevant or incorrect responses.
+```
+
+Ask for a structured output.
+
+让LLM生成结构化数据。
+
+```python {linenos=true}
+prompt = f"""
+Generate a list of three made-up book titles along \
+with their authors and genres. 
+Provide them in JSON format with the following keys: 
+book_id, title, author, genre.
+"""
+```
+
+```text {linenos=true}
+Sure, here is the list of three made-up book titles in JSON format:
+
+```json
+[
+    {
+        "book_id": "1",
+        "title": "Whispers of the Enchanted Forest",
+        "author": "Elara Moonshadow",
+        "genre": "Fantasy"
+    },
+    {
+        "book_id": "2",
+        "title": "Quantum Dreams: Journey Beyond Reality",
+        "author": "Dr. Ivan Sollix",
+        "genre": "Science Fiction"
+    },
+    {
+        "book_id": "3",
+        "title": "The Shadows of Victorian London",
+        "author": "Penelope Gracefield",
+        "genre": "Historical Mystery"
+    }
+]
+\`\`\`
+```
+
 # LangChain
 
 ## Simple LLM Application
@@ -220,6 +299,18 @@ In the code above, a complex chain is constructed: `{"context": retriever | form
 
 ![langsmith_trace](images/langsmith_trace.png)
 
+This complex chain `{"context": retriever | format_docs, "question": RunnablePassthrough()} | prompt | llm | StrOutputParser()` is fundamentally a `RunnableSequence`. A `RunnableSequence` is a type of `Runnable`, which means it can be combined with other `Runnable`s to form a more complex chain. This chain consists of four sequential parts:
+
+- `{"context": retriever | format_docs, "question": RunnablePassthrough()}`
+- `prompt`
+- `llm`
+- `StrOutputParser()`
+
+The first part `{"context": retriever | format_docs, "question": RunnablePassthrough()}` is automatically converted by LangChain into a `RunnableParallel` instance. Here, it is transformed into a `RunnableParallel` instance that takes a string input `"When will the 2024 Berkshire Hathaway Annual Shareholders Meeting be held?"`. This instance simultaneously passes this input to its two sub-chains. Now let's examine the first sub-chain `retriever | format_docs`: the first part is a `Retriever`, which takes the string input received by `RunnableParallel` and queries a vector database to return a list of documents. The second part, `format_docs`, is a function that LangChain converts into a `RunnableLambda`, which converts the list of documents into a single string.
+
+The second sub-chain of `RunnableParallel` is a `RunnablePassthrough()`, which returns the same content as its input from `RunnableParallel`. Ultimately, the output of `RunnableParallel` is a dictionary containing two keys, `context` and `question`, with corresponding string values.
+
+Now, this dictionary is passed to `prompt` which retrieves a string from the LangChain hub and converts it into a `ChatPromptTemplate`. This prompt template is formatted using the dictionary output from the previous step and then proceeds through `llm` and `StrOutputParser()` to produce the final result of the chain.
 
 # References
 
