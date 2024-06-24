@@ -7,86 +7,19 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
+# Self-attention
+
+Self-attention is a powerful neural network technique where the input consists of a sequence of vectors, and the output is also a sequence of vectors with the same size.
+
+![Self-Attention](images/self_attention.png)
+
+Multiple self-attention layers can be used in series.
+
+![Multiple Self-Attention](images/multiple_self_attention_tmp.png)
+
 这是我论文中的一段话，请你判断一下内容是否正确。
 
 那你帮我润色下，使它内容正确，用词精准，语句通顺。
-
-# Prompt Engineering
-
-https://learn.deeplearning.ai/courses/chatgpt-prompt-eng/
-
-## Prompting Principles
-
-### Principle 1: Write clear and specific instructions
-
-Use delimiters to clearly indicate distinct parts of the input. Delimiters can be anything like: ```, """, < >, &lt;tag> &lt;/tag>.
-
-使用分隔符来区分prompt中的不同的部分。
-
-```python {linenos=true}
-text = f"""
-You should express what you want a model to do by \
-providing instructions that are as clear and \
-specific as you can possibly make them. \
-This will guide the model towards the desired output, \
-and reduce the chances of receiving irrelevant \
-or incorrect responses. Don't confuse writing a \
-clear prompt with writing a short prompt. \
-In many cases, longer prompts provide more clarity \
-and context for the model, which can lead to \
-more detailed and relevant outputs.
-"""
-
-prompt = f"""
-Summarize the text delimited by triple backticks \
-into a single sentence.
-```{text}```
-"""
-```
-
-```text {linenos=true}
-Providing clear, specific, and detailed instructions in prompts helps guide a model to produce the desired output and reduces irrelevant or incorrect responses.
-```
-
-Ask for a structured output.
-
-让LLM生成结构化数据。
-
-```python {linenos=true}
-prompt = f"""
-Generate a list of three made-up book titles along \
-with their authors and genres. 
-Provide them in JSON format with the following keys: 
-book_id, title, author, genre.
-"""
-```
-
-```text {linenos=true}
-Sure, here is the list of three made-up book titles in JSON format:
-
-```json
-[
-    {
-        "book_id": "1",
-        "title": "Whispers of the Enchanted Forest",
-        "author": "Elara Moonshadow",
-        "genre": "Fantasy"
-    },
-    {
-        "book_id": "2",
-        "title": "Quantum Dreams: Journey Beyond Reality",
-        "author": "Dr. Ivan Sollix",
-        "genre": "Science Fiction"
-    },
-    {
-        "book_id": "3",
-        "title": "The Shadows of Victorian London",
-        "author": "Penelope Gracefield",
-        "genre": "Historical Mystery"
-    }
-]
-\`\`\`
-```
 
 # LangChain
 
