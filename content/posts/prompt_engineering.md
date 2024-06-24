@@ -1,0 +1,432 @@
+---
+title: "Prompt Engineering"
+summary: Learn About All Features in PaperMod
+date: 2024-06-09
+weight: 1
+tags: ["Web3"]
+author: ["Evanara Kumestra"]
+---
+
+这是我论文中的一段话，请你判断一下内容是否正确。
+
+那你帮我润色下，使它内容正确，用词精准，语句通顺。
+
+https://learn.deeplearning.ai/courses/chatgpt-prompt-eng/
+
+# Prompting Principles
+
+## Principle 1: Write clear and specific instructions
+
+### Use delimiters to clearly indicate distinct parts of the input. Delimiters can be anything like: ```, """, < >, &lt;tag> &lt;/tag>.
+
+使用分隔符来区分prompt中的不同的部分。
+
+```python {linenos=true}
+text = f"""
+You should express what you want a model to do by \
+providing instructions that are as clear and \
+specific as you can possibly make them. \
+This will guide the model towards the desired output, \
+and reduce the chances of receiving irrelevant \
+or incorrect responses. Don't confuse writing a \
+clear prompt with writing a short prompt. \
+In many cases, longer prompts provide more clarity \
+and context for the model, which can lead to \
+more detailed and relevant outputs.
+"""
+
+prompt = f"""
+Summarize the text delimited by triple backticks \
+into a single sentence.
+```{text}```
+"""
+```
+
+```text {linenos=true}
+Providing clear, specific, and detailed instructions in prompts helps guide a model to produce the desired output and reduces irrelevant or incorrect responses.
+```
+
+### Ask for a structured output.
+
+让LLM生成结构化数据。
+
+```python {linenos=true}
+prompt = f"""
+Generate a list of three made-up book titles along \
+with their authors and genres. 
+Provide them in JSON format with the following keys: 
+book_id, title, author, genre.
+"""
+```
+
+````text {linenos=true}
+Sure, here is the list of three made-up book titles in JSON format:
+
+```json
+[
+    {
+        "book_id": "1",
+        "title": "Whispers of the Enchanted Forest",
+        "author": "Elara Moonshadow",
+        "genre": "Fantasy"
+    },
+    {
+        "book_id": "2",
+        "title": "Quantum Dreams: Journey Beyond Reality",
+        "author": "Dr. Ivan Sollix",
+        "genre": "Science Fiction"
+    },
+    {
+        "book_id": "3",
+        "title": "The Shadows of Victorian London",
+        "author": "Penelope Gracefield",
+        "genre": "Historical Mystery"
+    }
+]
+```
+````
+
+### Ask the model to check whether conditions are satisfied
+
+让模型检查条件是否满足。
+
+```python {linenos=true}
+text_1 = f"""
+Making a cup of tea is easy! First, you need to get some \
+water boiling. While that's happening, \
+grab a cup and put a tea bag in it. Once the water is \
+hot enough, just pour it over the tea bag. \
+Let it sit for a bit so the tea can steep. After a \
+few minutes, take out the tea bag. If you \
+like, you can add some sugar or milk to taste. \
+And that's it! You've got yourself a delicious \
+cup of tea to enjoy.
+"""
+prompt = f"""
+You will be provided with text delimited by triple quotes. 
+If it contains a sequence of instructions, \
+re-write those instructions in the following format:
+
+Step 1 - ...
+Step 2 - …
+…
+Step N - …
+
+If the text does not contain a sequence of instructions, \
+then simply write \"No steps provided.\"
+
+\"\"\"{text_1}\"\"\"
+"""
+```
+
+```text {linenos=true}
+Step 1 - Get some water boiling.
+Step 2 - Grab a cup and put a tea bag in it.
+Step 3 - Once the water is hot enough, pour it over the tea bag.
+Step 4 - Let it sit for a bit so the tea can steep.
+Step 5 - After a few minutes, take out the tea bag.
+Step 6 - If you like, add some sugar or milk to taste.
+```
+
+```python {linenos=true}
+text_2 = f"""
+The sun is shining brightly today, and the birds are \
+singing. It's a beautiful day to go for a \
+walk in the park. The flowers are blooming, and the \
+trees are swaying gently in the breeze. People \
+are out and about, enjoying the lovely weather. \
+Some are having picnics, while others are playing \
+games or simply relaxing on the grass. It's a \
+perfect day to spend time outdoors and appreciate the \
+beauty of nature.
+"""
+prompt = f"""
+You will be provided with text delimited by triple quotes. 
+If it contains a sequence of instructions, \
+re-write those instructions in the following format:
+
+Step 1 - ...
+Step 2 - …
+…
+Step N - …
+
+If the text does not contain a sequence of instructions, \
+then simply write \"No steps provided.\"
+
+\"\"\"{text_2}\"\"\"
+"""
+```
+
+```text {linenos=true}
+No steps provided.
+```
+
+### "Few-shot" prompting
+
+给LLM例子，告诉它要如何回答问题。
+
+```python {linenos=true}
+prompt = f"""
+Your task is to answer in a consistent style.
+
+<child>: Teach me about patience.
+
+<grandparent>: The river that carves the deepest \
+valley flows from a modest spring; the \
+grandest symphony originates from a single note; \
+the most intricate tapestry begins with a solitary thread.
+
+<child>: Teach me about resilience.
+"""
+```
+
+```text {linenos=true}
+<grandparent>: The mighty oak stands tall and unwavering, having grown from a tiny acorn. Every storm that bends its branches only strengthens its roots. Similarly, a pearl forms from persistent grit within an oyster. Resilience is born from facing life's trials and emerging stronger, one step at a time.
+```
+
+## Principle 2: Give the model time to “think”
+
+让模型有时间去“思考”。
+
+### Specify the steps required to complete a task.
+
+指出要完成任务的步骤。
+
+```python {linenos=true}
+text = f"""
+In a charming village, siblings Jack and Jill set out on \
+a quest to fetch water from a hilltop \
+well. As they climbed, singing joyfully, misfortune \
+struck—Jack tripped on a stone and tumbled \
+down the hill, with Jill following suit. \
+Though slightly battered, the pair returned home to \
+comforting embraces. Despite the mishap, \
+their adventurous spirits remained undimmed, and they \
+continued exploring with delight.
+"""
+
+prompt_1 = f"""
+Perform the following actions: 
+1 - Summarize the following text delimited by triple \
+backticks with 1 sentence.
+2 - Translate the summary into French.
+3 - List each name in the French summary.
+4 - Output a json object that contains the following \
+keys: french_summary, num_names.
+
+Separate your answers with line breaks.
+
+Text:
+```{text}```
+"""
+```
+
+````text {linenos=true}
+1 - In a charming village, siblings Jack and Jill set out on a quest to fetch water from a hilltop well but ended up tumbling down and returned home slightly battered yet undeterred in spirit.
+
+2 - Dans un charmant village, les frères et sœurs Jack et Jill partent en quête d'eau à un puits au sommet d'une colline mais finissent par dégringoler et rentrent chez eux légèrement meurtris mais sans que leur esprit d'aventure ne soit entamé.
+
+3 - Jack, Jill
+
+4 - 
+```json
+{
+  "french_summary": "Dans un charmant village, les frères et sœurs Jack et Jill partent en quête d'eau à un puits au sommet d'une colline mais finissent par dégringoler et rentrent chez eux légèrement meurtris mais sans que leur esprit d'aventure ne soit entamé.",
+  "num_names": 2
+}
+```
+````
+
+Ask for output in a specified format.
+
+让LLM生成特定格式的内容。
+
+```python {linenos=true}
+text = f"""
+In a charming village, siblings Jack and Jill set out on \
+a quest to fetch water from a hilltop \
+well. As they climbed, singing joyfully, misfortune \
+struck—Jack tripped on a stone and tumbled \
+down the hill, with Jill following suit. \
+Though slightly battered, the pair returned home to \
+comforting embraces. Despite the mishap, \
+their adventurous spirits remained undimmed, and they \
+continued exploring with delight.
+"""
+
+prompt_2 = f"""
+Your task is to perform the following actions: 
+1 - Summarize the following text delimited by 
+  <> with 1 sentence.
+2 - Translate the summary into French.
+3 - List each name in the French summary.
+4 - Output a json object that contains the 
+  following keys: french_summary, num_names.
+
+Use the following format:
+Text: <text to summarize>
+Summary: <summary>
+Translation: <summary translation>
+Names: <list of names in summary>
+Output JSON: <json with summary and num_names>
+
+Text: <{text}>
+"""
+```
+
+```text {linenos=true}
+Summary: In a charming village, siblings Jack and Jill had an accident while fetching water but remained adventurous despite their mishap.
+Translation: Dans un charmant village, les frères et sœurs Jack et Jill ont eu un accident en allant chercher de l'eau, mais sont restés aventureux malgré leur mésaventure.
+Names: [Jack, Jill]
+Output JSON: {"french_summary": "Dans un charmant village, les frères et sœurs Jack et Jill ont eu un accident en allant chercher de l'eau, mais sont restés aventureux malgré leur mésaventure.", "num_names": 2}
+```
+
+### Instruct the model to work out its own solution before rushing to a conclusion
+
+让模型在给出答案之前说出来它的解决过程。
+
+```python {linenos=true}
+prompt = f"""
+Determine if the student's solution is correct or not.
+
+Question:
+I'm building a solar power installation and I need \
+ help working out the financials. 
+- Land costs $100 / square foot
+- I can buy solar panels for $250 / square foot
+- I negotiated a contract for maintenance that will cost \
+me a flat $100k per year, and an additional $10 / square \
+foot
+What is the total cost for the first year of operations 
+as a function of the number of square feet.
+
+Student's Solution:
+Let x be the size of the installation in square feet.
+Costs:
+1. Land cost: 100x
+2. Solar panel cost: 250x
+3. Maintenance cost: 100,000 + 100x
+Total cost: 100x + 250x + 100,000 + 100x = 450x + 100,000
+"""
+```
+
+```text {linenos=true}
+The student's solution is very close to correct but has a minor error in the maintenance cost calculation.
+
+Let's break down the costs step by step:
+
+1. **Land cost**: The cost of the land is $100 per square foot. So for \( x \) square feet, the land cost is \( 100x \).
+
+2. **Solar panel cost**: The cost of solar panels is $250 per square foot. So for \( x \) square feet, the solar panel cost is \( 250x \).
+
+3. **Maintenance cost**: The annual maintenance cost is a flat $100,000 plus $10 per square foot. 
+   - The correct formula for maintenance is given as $100,000 + 10x$, but the student mistakenly used $100x in their calculations.
+
+Combining these costs:
+
+- Land cost: \( 100x \)
+- Solar panel cost: \( 250x \)
+- Maintenance cost: \( 100,000 + 10x \)
+
+To find the total cost, add all these components together:
+
+\[
+\text{Total cost} = 100x + 250x + 100,000 + 10x = 360x + 100,000
+\]
+
+The revised total cost for the first year as a function of the number of square feet \( x \) is: 
+
+\[
+\boxed{360x + 100,000}
+\]
+
+Thus, the student's solution is not correct. The correct total cost as a function of the number of square feet should be \( 360x + 100,000 \).
+
+```
+
+````python {linenos=true}
+prompt = f"""
+Your task is to determine if the student's solution \
+is correct or not.
+To solve the problem do the following:
+- First, work out your own solution to the problem including the final total. 
+- Then compare your solution to the student's solution \
+and evaluate if the student's solution is correct or not. 
+Don't decide if the student's solution is correct until 
+you have done the problem yourself.
+
+Use the following format:
+Question:
+```
+question here
+```
+Student's solution:
+```
+student's solution here
+```
+Actual solution:
+```
+steps to work out the solution and your solution here
+```
+Is the student's solution the same as actual solution \
+just calculated:
+```
+yes or no
+```
+Student grade:
+```
+correct or incorrect
+```
+
+Question:
+```
+I'm building a solar power installation and I need help \
+working out the financials. 
+- Land costs $100 / square foot
+- I can buy solar panels for $250 / square foot
+- I negotiated a contract for maintenance that will cost \
+me a flat $100k per year, and an additional $10 / square \
+foot
+What is the total cost for the first year of operations \
+as a function of the number of square feet.
+``` 
+Student's solution:
+```
+Let x be the size of the installation in square feet.
+Costs:
+1. Land cost: 100x
+2. Solar panel cost: 250x
+3. Maintenance cost: 100,000 + 100x
+Total cost: 100x + 250x + 100,000 + 100x = 450x + 100,000
+```
+Actual solution:
+"""
+````
+
+````text {linenos=true}
+```
+Let \( x \) be the size of the installation in square feet.
+
+Costs:
+1. Land cost: \( 100x \)
+2. Solar panel cost: \( 250x \)
+3. Maintenance cost: \( 100,000 \) (flat fee) + \( 10x \)
+
+Total cost:
+\[ 100x + 250x + 100,000 + 10x \]
+
+Combine like terms:
+\[ 100x + 250x + 10x + 100,000 = 360x + 100,000 \]
+
+So, the total cost for the first year of operations as a function of the number of square feet is:
+\[ 360x + 100,000 \]
+```
+Is the student's solution the same as the actual solution just calculated:
+```
+No
+```
+Student grade:
+```
+Incorrect
+```
+````
