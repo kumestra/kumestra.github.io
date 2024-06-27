@@ -7,11 +7,7 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
-这是我论文中的一段话，请你判断一下内容是否正确。
-
-那你帮我润色下，使它内容正确，用词精准，语句通顺。
-
-https://learn.deeplearning.ai/courses/chatgpt-prompt-eng/
+这篇文章是吴恩达prompt engineering的笔记，https://learn.deeplearning.ai/courses/chatgpt-prompt-eng，课程使用的模型是gpt-3.5-turbo，我在gpt-4o对这些prompt重新进行了测试，发现有的例子已经不再适用，比如引起模型幻觉的prompt在新的模型上不会出现幻觉。但这个课程的prompt构建思路还是可以参考的。
 
 # Prompting Principles
 
@@ -430,3 +426,19 @@ Student grade:
 Incorrect
 ```
 ````
+
+## Model Limitations: Hallucinations
+
+Boie is a real company, the product name is not real.
+
+```python {linenos=true}
+prompt = f"""
+Tell me about AeroGlide UltraSlim Smart Toothbrush by Boie
+"""
+```
+
+```text {linenos=true}
+As of my knowledge cutoff date in October 2023, there is no specific product known as the "AeroGlide UltraSlim Smart Toothbrush" by Boie. Boie USA is a company known for its eco-friendly personal care products, including toothbrushes made from antimicrobial materials. Their toothbrushes generally focus on sustainability, with features like replaceable heads and materials designed to reduce bacteria build-up.
+
+It is possible that "AeroGlide UltraSlim Smart Toothbrush" may be a new product released after my last update, or it could be a rebranding of an existing product. To provide accurate and current information, I would recommend visiting the official Boie USA website or contacting their customer service directly for the most recent and detailed information about their product lineup.
+```
