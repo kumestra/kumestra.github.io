@@ -17,6 +17,10 @@ author: ["Evanara Kumestra"]
 - Each Pod gets its own IP address
 - New IP address on re-creation
 
+## Workload
+
+https://kubernetes.io/docs/concepts/workloads/
+
 ## Service
 
 https://kubernetes.io/docs/concepts/services-networking/service/
@@ -73,3 +77,19 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-a
 alias kubectl="minikube kubectl --"
 ```
 
+现在创建一个demo，由mongo-express，mongodb构成。先创建一个secret，这个secret中含有mongodb的账号密码。
+
+```shell {linenos=true}
+kubectl apply -f mongo-secret.yaml
+```
+
+```yaml {linenos=true}
+apiVersion: v1
+kind: Secret
+metadata:
+    name: mongodb-secret
+type: Opaque
+data:
+    mongo-root-username: dXNlcm5hbWU=
+    mongo-root-password: cGFzc3dvcmQ=
+```
