@@ -442,3 +442,7 @@ As of my knowledge cutoff date in October 2023, there is no specific product kno
 
 It is possible that "AeroGlide UltraSlim Smart Toothbrush" may be a new product released after my last update, or it could be a rebranding of an existing product. To provide accurate and current information, I would recommend visiting the official Boie USA website or contacting their customer service directly for the most recent and detailed information about their product lineup.
 ```
+
+# Iterative Prompt Development
+
+## Generate a marketing product description from a product fact sheet

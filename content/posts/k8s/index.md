@@ -32,6 +32,10 @@ Service has 2 functionalities
 - permanent IP
 - load balancer
 
+## Namespace
+
+https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+
 # Architecture
 
 ## Node
@@ -147,3 +151,75 @@ spec:
       targetPort: 27017
 ```
 
+然后创建一个configmap，这个configmap包含mongodb service的链接地址，然后创建mongodb express service，这个service从configmap中读取mongodb所在位置url。
+
+```shell {linenos=true}
+kubectl apply -f mongo-configmap.yaml
+```
+
+```yaml {linenos=true}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+data:
+  database_url: mongodb-service
+```
+
+```shell {linenos=true}
+kubectl apply -f mongo-express.yaml
+```
+
+```yaml {linenos=true}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express
+        ports:
+        - containerPort: 8081
+        env:
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom: 
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        - name: ME_CONFIG_MONGODB_SERVER
+          valueFrom: 
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: database_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer  
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30000
+```
