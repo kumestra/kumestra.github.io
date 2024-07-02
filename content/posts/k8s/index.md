@@ -7,6 +7,9 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
+**Labels**: Labels are key-value pairs attached to Kubernetes objects such as Pods, ReplicaSets, Nodes, Namespaces and Persistent Volumes.
+
+
 # Component
 
 ## Pod
@@ -23,14 +26,7 @@ https://kubernetes.io/docs/concepts/workloads/
 
 ## Service
 
-https://kubernetes.io/docs/concepts/services-networking/service/
-
-In Kubernetes, a Service is a method for exposing a network application that is running as one or more Pods in your cluster.
-
-Service has 2 functionalities
-
-- permanent IP
-- load balancer
+A Service offers a single DNS entry for a stateless containerized application managed by the Kubernetes cluster, regardless of the number of its replicas, by providing a common load balancing access point to a set of pods logically grouped and managed by a controller such as a Deployment, ReplicaSet, or DaemonSet.
 
 ## Namespace
 

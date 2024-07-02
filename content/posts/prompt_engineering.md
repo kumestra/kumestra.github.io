@@ -446,3 +446,133 @@ It is possible that "AeroGlide UltraSlim Smart Toothbrush" may be a new product 
 # Iterative Prompt Development
 
 ## Generate a marketing product description from a product fact sheet
+
+````python {linenos=true}
+fact_sheet_chair = """
+OVERVIEW
+- Part of a beautiful family of mid-century inspired office furniture, 
+including filing cabinets, desks, bookcases, meeting tables, and more.
+- Several options of shell color and base finishes.
+- Available with plastic back and front upholstery (SWC-100) 
+or full upholstery (SWC-110) in 10 fabric and 6 leather options.
+- Base finish options are: stainless steel, matte black, 
+gloss white, or chrome.
+- Chair is available with or without armrests.
+- Suitable for home or business settings.
+- Qualified for contract use.
+
+CONSTRUCTION
+- 5-wheel plastic coated aluminum base.
+- Pneumatic chair adjust for easy raise/lower action.
+
+DIMENSIONS
+- WIDTH 53 CM | 20.87”
+- DEPTH 51 CM | 20.08”
+- HEIGHT 80 CM | 31.50”
+- SEAT HEIGHT 44 CM | 17.32”
+- SEAT DEPTH 41 CM | 16.14”
+
+OPTIONS
+- Soft or hard-floor caster options.
+- Two choices of seat foam densities: 
+ medium (1.8 lb/ft3) or high (2.8 lb/ft3)
+- Armless or 8 position PU armrests 
+
+MATERIALS
+SHELL BASE GLIDER
+- Cast Aluminum with modified nylon PA6/PA66 coating.
+- Shell thickness: 10 mm.
+SEAT
+- HD36 foam
+
+COUNTRY OF ORIGIN
+- Italy
+"""
+prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+Technical specifications: ```{fact_sheet_chair}```
+"""
+````
+
+````text {linenos=true}
+**Product Description:**
+
+Elevate your workspace with the sophisticated charm of our mid-century inspired office chair, expertly crafted to blend style, comfort, and functionality. This chair is a proud member of our exquisite office furniture collection, which includes filing cabinets, desks, bookcases, and meeting tables. 
+
+**Design and Versatility:**
+Select from an alluring range of shell colors and base finishes to seamlessly complement any interior décor. Choose between a plastic back with front upholstery (SWC-100) or opt for full upholstery (SWC-110) available in 10 premium fabrics and 6 luxurious leather options. For the base, pick from stainless steel, matte black, gloss white, or chrome finishes, ensuring your chair is a perfect match for your aesthetic preferences. The chair is also available with or without armrests to suit your comfort needs.
+
+**Construction and Comfort:**
+Designed for both home and business settings, our chair is robust enough for contract use. It features a sturdy 5-wheel plastic coated aluminum base and a pneumatic adjust system that allows easy height adjustments. The details extend to offering soft or hard-floor caster options and two choices of seat foam densities (medium at 1.8 lb/ft³ and high at 2.8 lb/ft³) for personalized comfort. Armrests come with 8 adjustable positions in PU material for added flexibility.
+
+**Dimensions:**
+- Width: 53 cm (20.87”)
+- Depth: 51 cm (20.08”)
+- Height: 80 cm (31.50”)
+- Seat Height: 44 cm (17.32”)
+- Seat Depth: 41 cm (16.14”)
+
+**Quality Materials:**
+Constructed in Italy, every chair boasts a cast aluminum shell base with modified nylon PA6/PA66 coating, ensuring durability and longevity. The shell is a solid 10 mm thick, providing stability and support. The seat is made of high-quality HD36 foam, guaranteeing comfort even during long hours of use.
+
+Enhance your office with a chair that exemplifies refined elegance and superior craftsmanship. Choose our mid-century inspired office chair and experience the perfect blend of style and functionality.
+````
+
+## Issue 1: The text is too long
+
+问题1：文本过长
+
+````python {linenos=true}
+prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+Use at most 50 words.
+
+Technical specifications: ```{fact_sheet_chair}```
+"""
+````
+
+````text {linenos=true}
+Discover mid-century inspired elegance with our versatile office chair, perfect for home or professional settings. Customize with various shell colors, base finishes, and upholstery options. Ergonomically designed with adjustable height, 5-wheel base, and optional armrests. Crafted in Italy for premium quality and style.
+````
+
+## Issue 2. Text focuses on the wrong details
+
+Ask it to focus on the aspects that are relevant to the intended audience.
+
+````python {linenos=true}
+prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+The description is intended for furniture retailers, 
+so should be technical in nature and focus on the 
+materials the product is constructed from.
+
+Use at most 50 words.
+
+Technical specifications: ```{fact_sheet_chair}```
+"""
+````
+
+````text {linenos=true}
+Mid-century inspired office chair with plastic coated aluminum base, pneumatic height adjustment, and HD36 foam seat. Available in plastic back/front upholstery or full upholstery in 10 fabrics and 6 leathers. Choice of stainless steel, matte black, gloss white, or chrome base finish. Made in Italy for home or business use.
+````
