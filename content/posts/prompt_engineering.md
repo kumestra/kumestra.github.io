@@ -576,3 +576,83 @@ Technical specifications: ```{fact_sheet_chair}```
 ````text {linenos=true}
 Mid-century inspired office chair with plastic coated aluminum base, pneumatic height adjustment, and HD36 foam seat. Available in plastic back/front upholstery or full upholstery in 10 fabrics and 6 leathers. Choice of stainless steel, matte black, gloss white, or chrome base finish. Made in Italy for home or business use.
 ````
+
+## Issue 3. Description needs a table of dimensions
+
+Ask it to extract information and organize it in a table.
+
+````python {linenos=true}
+prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+The description is intended for furniture retailers, 
+so should be technical in nature and focus on the 
+materials the product is constructed from.
+
+At the end of the description, include every 7-character 
+Product ID in the technical specification.
+
+After the description, include a table that gives the 
+product's dimensions. The table should have two columns.
+In the first column include the name of the dimension. 
+In the second column include the measurements in inches only.
+
+Give the table the title 'Product Dimensions'.
+
+Format everything as HTML that can be used in a website. 
+Place the description in a <div> element.
+
+Technical specifications: ```{fact_sheet_chair}```
+"""
+````
+
+````text {linenos=true}
+```html
+<div>
+    <h2>Mid-Century Inspired Office Chair</h2>
+    <p>Discover the blend of elegance and functionality with our mid-century inspired office chair, meticulously crafted to meet both home and business needs. This chair is a part of an exquisite collection that includes filing cabinets, desks, bookcases, meeting tables, and more. You can customize your seating experience with several options for shell color and base finishes. Choose between a sleek plastic back with front upholstery (SWC-100) or indulge in the comfort of full upholstery (SWC-110), available in a variety of 10 fabric and 6 leather options.</p>
+    
+    <p>The chair boasts a robust 5-wheel plastic coated aluminum base, designed for durability and ease of movement. The base finishes offered include stainless steel, matte black, gloss white, or chrome, perfectly complementing any decor. The pneumatic chair adjustment mechanism provides smooth raising and lowering actions for ergonomic comfort. Armrest options include an armless version or an 8 position PU armrest, catering to individual preferences.</p>
+    
+    <p>Constructed in Italy, the chair integrates a cast aluminum shell with a modified nylon PA6/PA66 coating and has a shell thickness of 10 mm. It features a high-density HD36 foam seat, ensuring long-lasting comfort. Select between soft or hard-floor casters to suit your floor type and two seat foam density options, medium (1.8 lb/ft<sup>3</sup>) or high (2.8 lb/ft<sup>3</sup>), to fit your specific seating needs.</p>
+    
+    <p>This chair is not only stylish but also built to withstand contract use, making it a perfect choice for various settings, from private office spaces to bustling business environments.</p>
+
+    <p>Product IDs: SWC100, SWC110</p>
+</div>
+
+<h3>Product Dimensions</h3>
+<table border="1">
+    <tr>
+        <th>Dimension</th>
+        <th>Measurement (inches)</th>
+    </tr>
+    <tr>
+        <td>Width</td>
+        <td>20.87</td>
+    </tr>
+    <tr>
+        <td>Depth</td>
+        <td>20.08</td>
+    </tr>
+    <tr>
+        <td>Height</td>
+        <td>31.50</td>
+    </tr>
+    <tr>
+        <td>Seat Height</td>
+        <td>17.32</td>
+    </tr>
+    <tr>
+        <td>Seat Depth</td>
+        <td>16.14</td>
+    </tr>
+</table>
+```
+````

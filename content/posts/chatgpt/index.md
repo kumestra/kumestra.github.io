@@ -7,6 +7,11 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
+# Self-attention
+
+Self-attention is a powerful neural network technique where the input consists of a sequence of vectors, and the output is also a sequence of vectors with the same size.
+
+
 这是我论文中的一段话，请你判断一下内容是否正确。
 
 那你帮我润色下，使它内容正确，用词精准，语句通顺。

@@ -7,6 +7,10 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
+kcna learning path
+
+https://training.linuxfoundation.org/wp-content/uploads/2023/07/KCNA_CurriculumPath_Jul23.pdf
+
 **Labels**: Labels are key-value pairs attached to Kubernetes objects such as Pods, ReplicaSets, Nodes, Namespaces and Persistent Volumes.
 
 
