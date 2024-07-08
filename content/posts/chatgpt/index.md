@@ -11,6 +11,11 @@ author: ["Evanara Kumestra"]
 
 Self-attention is a powerful neural network technique where the input consists of a sequence of vectors, and the output is also a sequence of vectors with the same size.
 
+![Self-Attention](images/self_attention.png)
+
+Multiple self-attention layers can be used in series.
+
+![Multiple Self-Attention](images/multiple_self_attention_tmp.png)
 
 这是我论文中的一段话，请你判断一下内容是否正确。
 

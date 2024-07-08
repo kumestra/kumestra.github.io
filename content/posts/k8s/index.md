@@ -7,6 +7,10 @@ tags: ["Web3"]
 author: ["Evanara Kumestra"]
 ---
 
+# Linux
+
+BIOS - MBR/EFI - boot loader - Linux
+
 kcna learning path
 
 https://training.linuxfoundation.org/wp-content/uploads/2023/07/KCNA_CurriculumPath_Jul23.pdf
