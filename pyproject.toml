@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "kumestra-github-io"
+version = "0.1.0"
+description = ""
+authors = ["kumestra <renipmat@gmail.com>"]
+readme = "README.md"
+packages = [{include = "kumestra"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain-core = "^0.3.9"
+langchain-openai = "^0.2.2"
+langgraph = "^0.2.34"
+ipykernel = "^6.29.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
