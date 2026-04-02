@@ -1,7 +1,7 @@
 ---
 title: "OpenAI Codex: From Code Model to AI Agent Ecosystem"
 description: A comprehensive study of OpenAI Codex's evolution from a 2021 autocomplete model to a full-featured AI code agent platform in 2026, including architecture, product comparison, and lessons for building AI agents.
-pubDatetime: 2026-04-02T12:00:00Z
+pubDatetime: 2026-04-02T07:00:12Z
 tags: [ai-agent, openai, codex, code-agent, agent-architecture, llm-tools]
 ---
 
