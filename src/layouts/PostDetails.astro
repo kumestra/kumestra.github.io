@@ -35,7 +35,17 @@ const {
   hideEditPost,
 } = post.data;
 
-const { Content } = await render(post);
+// headings: array of { depth, slug, text }
+//   depth: heading level (2 = ##, 3 = ###, etc.)
+//   slug:  URL-friendly ID auto-generated from text (e.g. "grind-size")
+//   text:  raw heading text (e.g. "Grind size")
+// e.g. [
+//   { depth: 2, slug: "espresso", text: "Espresso" },
+//   { depth: 3, slug: "grind-size", text: "Grind size" },
+// ]
+const { Content, headings } = await render(post);
+
+const tocHeadings = headings.filter(h => h.depth <= 3);
 
 let ogImageUrl: string | undefined;
 
@@ -113,6 +123,27 @@ const nextPost =
     >
       <Content />
     </article>
+
+    {tocHeadings.length > 0 && (
+      <nav class="toc-sidebar hidden xl:block fixed top-20 right-[calc(50%-min(65ch,100%)/2-16rem-6rem)] w-56">
+        <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-foreground/70">
+          On this page
+        </h2>
+        <ul class="space-y-1 text-sm">
+          {tocHeadings.map(h => (
+            <li class:list={[{ "ml-4": h.depth === 3 }]}>
+              <a
+                href={`#${h.slug}`}
+                data-toc-link={h.slug}
+                class="block py-0.5 text-foreground/60 transition-colors hover:text-accent"
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
 
     <hr class="my-8 border-dashed" />
 
@@ -277,6 +308,69 @@ const nextPost =
     }
   }
   attachCopyButtons();
+
+  // Highlight the TOC sidebar link that matches the section currently being read.
+  //
+  // How it works:
+  //   1. Find all TOC <a> links (they have data-toc-link="slug" attributes).
+  //   2. For each TOC link, find the corresponding <h2>/<h3> in the article body
+  //      by matching data-toc-link value to the heading's id.
+  //   3. Use IntersectionObserver to watch those headings. When a heading scrolls
+  //      into the top 20% of the viewport (either direction), highlight its TOC
+  //      link and dim all others.
+  //
+  // Why IntersectionObserver instead of scroll events?
+  //   The browser runs scroll events on every pixel of movement. IntersectionObserver
+  //   only fires when a heading crosses the zone boundary, which is much cheaper.
+  function setupTocHighlight() {
+    // All <a> tags in the TOC sidebar (rendered from tocHeadings in the template)
+    const tocLinks = document.querySelectorAll("[data-toc-link]");
+    if (!tocLinks.length) return;
+
+    // Map each TOC link → the actual heading element in the article
+    // e.g. <a data-toc-link="espresso"> → <h2 id="espresso">
+    // filter(Boolean) removes nulls in case a heading id doesn't exist
+    const headings = Array.from(tocLinks).map(link => {
+      const id = link.getAttribute("data-toc-link");
+      return document.getElementById(id);
+    }).filter(Boolean);
+
+    const observer = new IntersectionObserver(
+      // entries: array of headings whose visibility just changed
+      //   entry.isIntersecting — true if heading entered the zone, false if it left
+      //   entry.target — the heading DOM element (e.g. <h2 id="espresso">)
+      entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            // Dim all TOC links
+            tocLinks.forEach(link => {
+              link.classList.remove("text-accent", "font-medium");
+              link.classList.add("text-foreground/60");
+            });
+            // Find and highlight the TOC link matching this heading
+            const activeLink = document.querySelector(
+              `[data-toc-link="${entry.target.id}"]`
+            );
+            if (activeLink) {
+              activeLink.classList.add("text-accent", "font-medium");
+              activeLink.classList.remove("text-foreground/60");
+            }
+          }
+        }
+      },
+      {
+        // Shrink the detection zone to the top 20% of the viewport.
+        // Format: "top right bottom left" — -80% bottom cuts off the lower 80%.
+        rootMargin: "0px 0px -80% 0px",
+        // Trigger as soon as 1 pixel of a heading enters the zone.
+        threshold: 0,
+      }
+    );
+
+    // Start watching each heading
+    headings.forEach(h => observer.observe(h));
+  }
+  setupTocHighlight();
 
   /* Go to page start after page swap */
   document.addEventListener("astro:after-swap", () =>
