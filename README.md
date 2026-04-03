@@ -95,6 +95,14 @@ Documentation can be read in two formats\_ _markdown_ & _blog post_.
 **Illustration in About Page** - [https://freesvgillustration.com](https://freesvgillustration.com/)  
 **Linting** - [ESLint](https://eslint.org)
 
+## 📦 Installing pnpm
+
+If you don't have pnpm installed, you can install it via npm:
+
+```bash
+npm install -g pnpm
+```
+
 ## 👨🏻‍💻 Running Locally
 
 You can start using this project locally by running the following command in your desired directory:
