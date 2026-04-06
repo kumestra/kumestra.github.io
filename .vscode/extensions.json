@@ -1,4 +1,12 @@
 {
-  "recommendations": ["astro-build.astro-vscode"],
+  "recommendations": [
+    "astro-build.astro-vscode",
+    "eamodio.gitlens",
+    "bierner.markdown-mermaid",
+    "bierner.markdown-footnotes",
+    "bierner.markdown-yaml-preamble",
+    "bierner.markdown-emoji",
+    "bierner.markdown-checkbox"
+  ],
   "unwantedRecommendations": []
 }
