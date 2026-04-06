@@ -97,7 +97,13 @@ Documentation can be read in two formats\_ _markdown_ & _blog post_.
 
 ## 📦 Installing pnpm
 
-If you don't have pnpm installed, you can install it via npm:
+Check if pnpm is already installed:
+
+```bash
+pnpm --version
+```
+
+If you see a version number, pnpm is installed. If you get "command not found", install it via npm:
 
 ```bash
 npm install -g pnpm
