@@ -1,5 +1,5 @@
 ---
-title: From Laplace's Demon to Quantum Mechanics: Determinism, Wave Functions, and the Math Beneath
+title: "From Laplace's Demon to Quantum Mechanics: Determinism, Wave Functions, and the Math Beneath"
 description: A concept guide tracing the fall of classical determinism through quantum mechanics, with the mathematical foundations — complex numbers, Hilbert space, and ZFC — that make the modern picture rigorous.
 pubDatetime: 2026-04-22T22:52:18Z
 tags: [physics, quantum-mechanics, mathematics, complex-numbers, hilbert-space, determinism, linear-algebra, ZFC, wave-function]
