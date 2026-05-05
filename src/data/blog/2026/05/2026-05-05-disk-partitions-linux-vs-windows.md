@@ -108,15 +108,15 @@ A subtle but important point: in `lsblk` output, `/boot` and `/` look like paren
 
 ```mermaid
 flowchart LR
-    subgraph Logical[Logical view]
-        R[/]
-        R --> B[/boot]
-        R --> H[/home]
-        R --> E[/etc]
+    subgraph Logical["Logical view"]
+        R["/"]
+        R --> B["/boot"]
+        R --> H["/home"]
+        R --> E["/etc"]
     end
-    subgraph Physical[Physical view]
-        P1[sda2 ext4 → /boot]
-        P2[ubuntu-lv ext4 → /]
+    subgraph Physical["Physical view"]
+        P1["sda2 ext4 → /boot"]
+        P2["ubuntu-lv ext4 → /"]
     end
 ```
 
