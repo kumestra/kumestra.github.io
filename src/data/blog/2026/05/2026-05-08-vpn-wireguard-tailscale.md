@@ -181,13 +181,13 @@ Tailscale is *peer-to-peer*: central servers handle authentication and key excha
 
 ```mermaid
 flowchart TB
-  subgraph Hub-and-spoke (traditional VPN)
+  subgraph hub["Hub-and-spoke (traditional VPN)"]
     A1[Laptop] --> H[Concentrator]
     A2[Server] --> H
     A3[Phone] --> H
   end
 
-  subgraph Mesh (Tailscale)
+  subgraph mesh["Mesh (Tailscale)"]
     B1[Laptop] <--> B2[Server]
     B1 <--> B3[Phone]
     B2 <--> B3
