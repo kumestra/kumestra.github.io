@@ -145,6 +145,50 @@ Verify:
 sudo ip netns exec demo ping 8.8.8.8
 ```
 
+## Inside the namespace: it really is a machine on a subnet
+
+From within `demo`, the kernel makes the illusion exact. Run:
+
+```bash
+sudo ip netns exec demo ip addr
+sudo ip netns exec demo ip route
+sudo ip netns exec demo ip neigh
+```
+
+…and you see what you'd see on a fresh laptop plugged into a `10.0.0.0/24` LAN:
+
+```
+eth0: 10.0.0.2/24
+lo:   127.0.0.1/8
+
+default via 10.0.0.1 dev eth0
+10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.2
+
+10.0.0.1 dev eth0 lladdr <veth-host's MAC> REACHABLE
+```
+
+The namespace cannot tell — and has no way to discover — that:
+
+- The "subnet" has only two members (itself and `veth-host`).
+- The "gateway" is the same kernel it's running on.
+- The cable to the gateway is a kernel memory copy.
+
+| Real LAN concept | In Pattern 1 |
+|---|---|
+| The subnet (e.g. `10.0.0.0/24`) | The `/24` configured on both veth ends |
+| The machine on the subnet | The `demo` namespace |
+| The machine's IP | `10.0.0.2` on `eth0` |
+| The machine's MAC | Auto-assigned MAC on the veth end inside `demo` |
+| The router/gateway on the subnet | `veth-host` (`10.0.0.1`) in the host namespace |
+| The gateway's WAN side | `ens33` on the host |
+| The Ethernet cable to the switch | The veth pair itself |
+| ARP "who has 10.0.0.1?" | Real ARP, exchanged across the veth pair |
+| ARP cache (`ip neigh`) | Populated normally |
+
+The fidelity is exact at L2 and L3. The namespace really sends ARP requests, really caches neighbors, really computes checksums — none of it is mocked. The only thing that's "virtual" is the physical medium underneath the veth, and even that is transparent to every layer above. That's why this is a **kernel feature** rather than a userspace simulator: it's a real, independent instance of the network stack.
+
+Anything that works on a real machine works inside the namespace — `dhclient`, `traceroute`, listening servers, iptables rules — all of it, all unmodified.
+
 ## Packet flow: ping 8.8.8.8 from inside demo
 
 ```mermaid
@@ -172,6 +216,130 @@ sequenceDiagram
     VH-->>VD: frame across veth pair
     VD-->>App: deliver to socket
 ```
+
+## After Pattern 1, the host wears two hats
+
+Before the namespace existed, the host was just an **endpoint** — packets in and out of `ens33` were for its own processes. After Pattern 1, the same kernel now plays **two roles** on the same `ens33`:
+
+| Role | Who is served |
+|---|---|
+| **Endpoint** | The host's own apps (sshd, browser, etc.) |
+| **NAT router** | The `demo` namespace |
+
+From outside, nothing changes. The LAN still sees one MAC and one IP. The namespace's existence is invisible — that's the whole point of NAT.
+
+```mermaid
+flowchart TB
+    LAN[("🌐 LAN<br/>sees only 192.168.1.156")]
+
+    subgraph host["🖥️ Host machine (one box from outside)"]
+        ENS["ens33<br/>192.168.1.156"]
+
+        subgraph default["Default namespace"]
+            HOSTAPP["host's apps<br/>(sshd, browser…)"]
+            VH["veth-host<br/>10.0.0.1"]
+            NAT[/"NAT + forwarding<br/>(router role)"/]
+        end
+
+        subgraph demo["demo namespace"]
+            NSAPP["namespace's app<br/>10.0.0.2"]
+        end
+
+        ENS --- HOSTAPP
+        ENS --- NAT
+        NAT --- VH
+        VH <-->|veth pair| NSAPP
+    end
+
+    LAN <--> ENS
+
+    style default fill:#e8f4f8,stroke:#2980b9
+    style demo fill:#fef5e7,stroke:#e67e22
+```
+
+When a frame arrives on `ens33`, the host's IP layer looks at the **destination address** in the packet and decides which hat to wear:
+
+| dst IP in arriving packet | Role | Outcome |
+|---|---|---|
+| `192.168.1.156` (host's own IP) | **endpoint** | delivered to host's local socket table |
+| Anything else (and forwarding is on) | **router** | forwarded — possibly DNAT'd into the namespace |
+| `10.0.0.2` directly | (can't happen) | LAN doesn't route `10.0.0.0/24`; the packet never reaches `ens33` |
+
+That third row is the load-bearing fact: **the outside world cannot address the namespace directly.** Unsolicited inbound traffic for the namespace can only arrive *addressed to the host's IP*, and the host has to rewrite the destination before forwarding. That's **DNAT** — the inverse of the outbound MASQUERADE.
+
+## Inbound traffic: replies vs unsolicited
+
+### Reply traffic — automatic, free of charge
+
+If the namespace **initiated** the connection (the `ping 8.8.8.8` case above), the kernel's **conntrack** subsystem already recorded the NAT mapping:
+
+```
+10.0.0.2:54321  ↔  (MASQUERADE)  ↔  192.168.1.156:54321  ↔  8.8.8.8:80
+```
+
+When `8.8.8.8` replies to `192.168.1.156:54321`, conntrack reverses the rewrite automatically:
+
+- Incoming: `src=8.8.8.8, dst=192.168.1.156:54321`
+- Rewritten: `src=8.8.8.8, dst=10.0.0.2:54321`
+- Forwarded across the veth into `demo`.
+
+You don't write any extra rule for this — MASQUERADE + conntrack handles both directions. ✅
+
+### Unsolicited inbound — needs an explicit DNAT rule
+
+To let someone *outside* reach a server bound to `10.0.0.2:80` inside `demo`, the host needs a port-forward rule: *"packets arriving on `ens33` for me on port 8080 — rewrite to `10.0.0.2:80` and forward."*
+
+```bash
+sudo iptables -t nat -A PREROUTING \
+    -i ens33 -p tcp --dport 8080 \
+    -j DNAT --to-destination 10.0.0.2:80
+```
+
+This is **exactly the "port forwarding" page on a home router**:
+
+| Home router | Pattern 1 |
+|---|---|
+| "Open port 8080, forward to 192.168.1.50:80" | the iptables DNAT rule above |
+| Router's WAN IP | `192.168.1.156` |
+| Internal device IP | `10.0.0.2` |
+
+```mermaid
+sequenceDiagram
+    participant Client as External client
+    participant ENS as ens33 (192.168.1.156)
+    participant DNAT as iptables PREROUTING DNAT
+    participant Route as host routing
+    participant VH as veth-host
+    participant VD as eth0 (10.0.0.2) in demo
+    participant App as nginx in demo
+
+    Client->>ENS: TCP SYN dst=192.168.1.156:8080
+    ENS->>DNAT: arriving packet
+    DNAT->>Route: rewrite dst → 10.0.0.2:80
+    Route->>VH: route 10.0.0.0/24 via veth-host
+    VH->>VD: frame across veth pair
+    VD->>App: socket match (10.0.0.2:80)
+    App-->>VD: SYN-ACK src=10.0.0.2:80
+    VD-->>VH: across veth pair
+    VH-->>DNAT: conntrack reverses src → 192.168.1.156:8080
+    DNAT-->>ENS: send out
+    ENS-->>Client: reply src=192.168.1.156:8080
+```
+
+The client never sees `10.0.0.2`. From its perspective, the response came straight from `192.168.1.156:8080` — exactly like a server behind a home router answering on the router's public IP. 🎭
+
+### The complete inbound dispatch table
+
+After Pattern 1, the host's inbound dispatch on `ens33` looks like:
+
+```
+dst=192.168.1.156:22       → host's sshd                  (endpoint role)
+dst=192.168.1.156:8080     → DNAT → 10.0.0.2:80           (router role, unsolicited)
+dst=192.168.1.156:54321    → conntrack → 10.0.0.2:54321   (router role, reply)
+dst=anything else          → drop (or forward if routed)
+```
+
+So: **from outside it's still one machine. From inside, the host is now wearing two hats — a normal endpoint for its own processes, and a NAT router for the namespace.** Outbound traffic from the namespace gets source-rewritten; inbound traffic addressed to the host's IP either flows to local apps, or — if a DNAT rule matches — gets destination-rewritten and forwarded into the namespace.
 
 ## The three responsibilities the host has to take on
 
@@ -226,10 +394,13 @@ sudo ip netns exec demo curl https://example.com   # DNS now resolves
 
 ```bash
 sudo iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o ens33 -j MASQUERADE
+# also drop the DNAT rule if you added one:
+# sudo iptables -t nat -D PREROUTING -i ens33 -p tcp --dport 8080 \
+#     -j DNAT --to-destination 10.0.0.2:80
 sudo ip link del veth-host           # also removes the peer
 sudo ip netns del demo
 ```
 
 ## One-line summary
 
-> Pattern 1 turns the host into a tiny NAT router with one client: a veth pair carries packets between the namespace and the host, the host's routing table picks the upstream interface, IP forwarding lets packets cross, and MASQUERADE rewrites the source IP so replies come home. Add a bridge in the middle and you have Docker. ⚙️
+> Pattern 1 turns the host into a tiny NAT router with one client. From inside the namespace, it looks like a normal machine on a `10.0.0.0/24` subnet with `10.0.0.1` as its gateway. From outside, the machine is unchanged — but the kernel now wears two hats: an endpoint for its own apps, and a NAT router that MASQUERADEs the namespace's outbound traffic and (optionally) DNATs unsolicited inbound traffic into it. Add a bridge in the middle and you have Docker. ⚙️
