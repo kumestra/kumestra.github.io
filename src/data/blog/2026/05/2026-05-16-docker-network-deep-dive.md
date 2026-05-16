@@ -36,6 +36,149 @@ The bridge plays **two roles simultaneously**:
 
 Same dual nature as `br-lan` in a home Wi-Fi router — Wi-Fi clients on the same SSID L2-switch directly through `br-lan`, and the same `br-lan` is also the gateway IP for traffic heading to the internet. 🌉
 
+## Under the hood: building docker0 by hand
+
+Docker doesn't invent anything. `docker0` is three Linux primitives composed in a specific shape — and that shape is exactly what the [Pattern 2 netns post][pattern2] walks through. If you can build it from primitives, you understand what Docker is doing on every `docker run`.
+
+### The three primitives
+
+| Primitive | What it is |
+|---|---|
+| **Network namespace** | A private copy of the kernel's network stack — its own interfaces, routing table, ARP cache, iptables rules, socket table, port space. A fresh namespace has only `lo` (and it's down). Each container runs in one. |
+| **veth pair** | A virtual ethernet cable with two ends. Frames written to one end pop out the other. One end stays in the host namespace, the other moves into the container's namespace and gets renamed `eth0`. |
+| **Linux bridge** | A software L2 switch. Multiple network interfaces can be "plugged in" (mastered to it); the bridge learns MACs and forwards frames between ports. |
+
+### The topology (Pattern 2)
+
+```mermaid
+flowchart TB
+    INET[("🌐 LAN / Internet")]
+
+    subgraph host["🖥️ Host namespace"]
+        direction TB
+        ENS["<b>ens33</b><br/>192.168.1.156"]
+        NAT[/"MASQUERADE<br/>-s 172.17.0.0/16 -o ens33"/]
+        FWD{{"IP forwarding<br/>ip_forward=1"}}
+        BR["<b>docker0</b> (bridge)<br/>172.17.0.1/16<br/>= virtual L2 switch + gateway"]
+        VHA["veth-hA<br/>(no IP)"]
+        VHB["veth-hB<br/>(no IP)"]
+        VHC["veth-hC<br/>(no IP)"]
+    end
+
+    subgraph A["📦 container A netns"]
+        EA["eth0<br/>172.17.0.2<br/>gw 172.17.0.1"]
+    end
+    subgraph B["📦 container B netns"]
+        EB["eth0<br/>172.17.0.3<br/>gw 172.17.0.1"]
+    end
+    subgraph C["📦 container C netns"]
+        EC["eth0<br/>172.17.0.4<br/>gw 172.17.0.1"]
+    end
+
+    INET <--> ENS
+    ENS <--> NAT
+    NAT <--> FWD
+    FWD <--> BR
+    BR --- VHA
+    BR --- VHB
+    BR --- VHC
+    VHA <-->|veth| EA
+    VHB <-->|veth| EB
+    VHC <-->|veth| EC
+
+    style host fill:#e8f4f8,stroke:#2980b9
+    style A fill:#fef5e7,stroke:#e67e22
+    style B fill:#fef5e7,stroke:#e67e22
+    style C fill:#fef5e7,stroke:#e67e22
+```
+
+The structural rules of Pattern 2:
+
+- The **bridge owns the gateway IP** (`172.17.0.1`). The host-side veth ends have *no* IPs — they're just patch cables into the bridge.
+- All containers sit on the **same subnet** (`172.17.0.0/16`), so they can reach each other purely through L2 switching on the bridge — no NAT, no host routing involvement.
+- The host runs **IP forwarding + MASQUERADE** to give containers an exit route via `ens33` to the LAN/internet.
+- For unsolicited inbound, the host installs **DNAT rules** rewriting `host:port` → `container_ip:port` (this is what `-p` does, covered later in this post).
+
+### Recreating docker0 by hand
+
+To prove there's nothing magic about Docker's bridge, you can build the same setup with `ip` commands. The shape is:
+
+```bash
+# 1. Create the bridge and give it the gateway IP
+sudo ip link add docker0 type bridge
+sudo ip addr add 172.17.0.1/16 dev docker0
+sudo ip link set docker0 up
+
+# For EACH container netns, repeat steps 2-6:
+
+# 2. Create the namespace
+sudo ip netns add ctr-A
+
+# 3. Create a veth pair
+sudo ip link add veth-hA type veth peer name veth-nA
+
+# 4. Move one end into the namespace, plug the other into the bridge
+sudo ip link set veth-nA netns ctr-A
+sudo ip link set veth-hA master docker0
+sudo ip link set veth-hA up
+
+# 5. Configure the namespace side
+sudo ip netns exec ctr-A ip addr add 172.17.0.2/16 dev veth-nA
+sudo ip netns exec ctr-A ip link set veth-nA up
+sudo ip netns exec ctr-A ip link set lo up
+
+# 6. Default route via the bridge IP
+sudo ip netns exec ctr-A ip route add default via 172.17.0.1
+
+# 7. (once for the host) Enable forwarding + NAT
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING -s 172.17.0.0/16 -o ens33 -j MASQUERADE
+```
+
+To add a second container, repeat steps 2–6 with new names (`ctr-B`, `veth-hB`, `veth-nB`, `172.17.0.3`). To add a third, fourth, hundredth — same pattern. That's the scalability win of using a bridge: each new container is just one more veth plugged into the same switch.
+
+Verify the wiring matches what Docker does:
+
+```bash
+bridge link                # which interfaces are plugged into the bridge
+ip -d link show docker0    # bridge details
+```
+
+You'll see the host-side veth ends with `master docker0`, identical to what `docker run` produces.
+
+### What Docker automates
+
+Every `docker run` performs the following sequence; you just don't see it:
+
+| Manual step | What Docker does |
+|---|---|
+| Create the bridge | Done once at daemon start (`docker0`); user-defined networks create more bridges |
+| Allocate an IP for the container | IPAM assigns the next free address in the network's subnet |
+| Create the veth pair | Auto-named (`veth6dc8241` style) with a hashed identifier |
+| Create the netns | Linked under `/var/run/docker/netns/<id>` |
+| Move one end into the netns + rename to `eth0` | Same `ip link set ... netns` mechanic |
+| Plug the other end into the bridge | `ip link set ... master docker0` |
+| Configure IP, route, lo | Done before the container's entrypoint runs |
+| Enable forwarding + MASQUERADE | Done once at daemon start; rules in iptables `nat` table |
+| Per-port DNAT rules | Created on demand when you pass `-p` |
+
+Three flags map directly to changes in this Pattern 2 shape:
+
+- `docker network create my-net` → new bridge in the host namespace, new subnet (`172.18.0.0/16`, etc.), new veth pairs for any container attached.
+- `docker run --network=host` → **skip the namespace entirely**. The container runs in the host's network namespace. No veth, no `docker0` involvement. Loses all isolation; gains direct access to host interfaces.
+- `docker run --network=none` → put the container in a fresh namespace but **don't wire it up**. It has only `lo`. Useful for batch jobs that don't need networking, or for setting up networking yourself afterwards.
+
+### Why this matters
+
+Once you see Docker as "Pattern 2 with conveniences on top," several things stop being mysterious:
+
+- **Multiple Docker networks** = multiple bridges, each its own subnet, with no IP routing between them by default. That's why containers on different `docker network create` networks can't see each other without being attached to both.
+- **`docker network connect <network> <container>`** = create another veth pair and plug it into the second bridge. The container now has two `eth*` interfaces and can talk to both networks.
+- **Kubernetes pods sharing networking** = multiple containers placed in the *same* network namespace (the "pause container" trick). They share `eth0`, `lo`, and the port space — which is why two containers in one pod can't both bind to port 80.
+- **CNI plugins** (Flannel, Calico, etc.) = different ways of implementing the same Pattern 2 mechanics across multiple hosts, by replacing the local bridge with VXLAN tunnels or BGP routing.
+
+Same primitive, different sticker. 🐳
+
 ## Why Docker uses 172.17.0.1 (and not 192.168.0.1)
 
 [RFC 1918][rfc1918] reserves three private IP ranges that the public internet promises never to route:
