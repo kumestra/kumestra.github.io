@@ -324,7 +324,7 @@ This solves the problem ~90% of the time — you never pick cookies at all.
 
 When option A fails (different machine, headless server, no browser installed), export to Netscape `cookies.txt` format.
 
-**Use a browser extension** — Chrome: "Get cookies.txt LOCALLY" or "cookies.txt"; Firefox: "cookies.txt". Browse to the site while logged in, click the extension, save the file:
+**Use a browser extension** — on Chrome, either [Get cookies.txt LOCALLY][ext-getcookies-local] (recommended in the `yt-dlp` community — open source, data stays on your device) or [cookies.txt][ext-cookiestxt]; on Firefox, "cookies.txt". Browse to the site while logged in, click the extension, save the file:
 
 ```bash
 yt-dlp --cookies cookies.txt "https://..."
@@ -372,6 +372,8 @@ yt-dlp --cookies cookies.txt "<video URL>"
 The "which cookie is the login cookie?" question disappears when you hand the downloader the whole jar.
 
 [ytdlp]: https://github.com/yt-dlp/yt-dlp
+[ext-getcookies-local]: https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+[ext-cookiestxt]: https://chromewebstore.google.com/detail/cookiestxt/hokhagejalmnclpgldcefjckgmhpogdd
 
 ## Mental model recap
 
