@@ -158,4 +158,4 @@ If you want to see **what's underneath PyTorch**, read llm.c.
 - [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT)
 - [karpathy/build-nanogpt](https://github.com/karpathy/build-nanogpt)
 - [karpathy/llm.c](https://github.com/karpathy/llm.c)
-- Video: *Let's reproduce GPT-2 (124M)* — Andrej Karpathy, June 2024
+- Video: [*Let's reproduce GPT-2 (124M)*](https://www.youtube.com/watch?v=l8pRSuU81PU) — Andrej Karpathy, June 2024
