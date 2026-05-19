@@ -1,8 +1,8 @@
 ---
 title: "LangChain Ecosystem, and Why Autonomous Agents Resist Frameworks"
-description: A map of the LangChain ecosystem and a working theory of why autonomous AI agents are built from scratch while workflow agents live inside frameworks.
+description: A map of the LangChain ecosystem and a working theory of why autonomous AI agents are built from scratch while workflow agents live inside frameworks — plus why the industry's "agent" vs. "workflow" terminology is a mess.
 pubDatetime: 2026-05-19T08:59:15Z
-tags: [langchain, langgraph, langsmith, ai-agents, dify, n8n, claude-code, workflow, autonomous-agents]
+tags: [langchain, langgraph, langsmith, ai-agents, dify, n8n, claude-code, workflow, autonomous-agents, terminology]
 ---
 
 The LangChain ecosystem is genuinely confusing on first contact — the naming is bad and the marketing blurs what each piece actually is. This post first lays out the ecosystem cleanly, then uses it to explore a deeper question: **why are famous AI agent products almost all autonomous/ReAct-style, while agent frameworks tend to look like workflow engines?**
@@ -227,11 +227,85 @@ If you embed an autonomous agent inside a workflow (a common production pattern)
 
 A common bug is forgetting #2: the autonomous node "finishes" but its output is ambiguous, so the workflow can't decide where to go next. The fix is usually constraining the autonomous node to return structured output instead of free text.
 
-## 6. Takeaways
+## 6. The terminology is a mess — "agent" vs. "workflow"
+
+Push the structural argument one more turn and something uncomfortable falls out: most things people call "AI agents" today aren't agents at all. They're workflows with LLM-aware nodes.
+
+### LangGraph / Dify are architecturally just Airflow + LLM nodes
+
+A program built on LangGraph or Dify is **structurally indistinguishable from an Apache Airflow DAG**. The only differences are:
+
+- Some nodes happen to call an LLM API instead of a pre-defined function.
+- Some edges happen to be conditioned on LLM output instead of a Python predicate.
+
+But the **graph topology is fixed at design time.** The developer drew the boxes and arrows. The LLM just fills in some nodes and influences some routing. That's not fundamentally different from an Airflow task calling a classifier model to decide which downstream task runs.
+
+| Apache Airflow | LangGraph / Dify |
+|---|---|
+| DAG defined by developer | Graph defined by developer |
+| Tasks call functions | Nodes call functions or LLMs |
+| Branching via Python operators | Branching via LLM output |
+| Retries, state, scheduling | Retries, state, scheduling |
+
+So calling these "AI agents" is mostly **marketing relabeling of workflow engines** that gained LLM-aware nodes. They're "LLM-enabled workflows," not agents in any new sense.
+
+### What makes Claude Code / Cursor / Codex different
+
+These have **no pre-defined graph at all.** The developer writes:
+
+```python
+while not done:
+    response = model.call(messages, tools)
+    ...
+```
+
+That's it. The "graph" of what happens — which tool, in what order, with what arguments, whether to retry, when to stop — is constructed by the model at runtime, token by token. **The control flow is the model's output.** That's the qualitative difference that earns the word "agent."
+
+### Anthropic's published definition matches this
+
+Anthropic's late-2024 essay *Building Effective Agents* draws the same line:
+
+> **Workflows** are systems where LLMs and tools are orchestrated through predefined code paths.
+> **Agents** are systems where LLMs dynamically direct their own processes and tool usage, maintaining control over how they accomplish tasks.
+
+By that definition:
+
+- LangGraph apps, Dify apps, n8n flows → **workflows** (no matter how many LLM nodes they contain)
+- Claude Code, Cursor, Codex → **agents**
+
+### Why the industry's vocabulary is unreliable
+
+In practice nobody uses these words consistently:
+
+- **"AI agent"** is used for everything from a single chatbot turn to fully autonomous systems. Marketing loves it because it sounds advanced. Often means "anything with an LLM in it."
+- **"Workflow"** sometimes means "predefined graph" (Anthropic's usage), sometimes means "any orchestration including agents." "Agentic workflow" as a middle term only makes things worse.
+- **"Autonomous"** sometimes means "model-driven control flow," sometimes means "runs without a human in the loop." Different axes — a model-driven system can still be human-supervised, and a human-out-of-loop system can have zero model control.
+- **"ReAct"** is a specific pattern from a 2022 paper (Reasoning + Acting — interleaved chain-of-thought and tool use). Most people use it loosely to mean "any tool-using LLM loop." The pattern has largely been absorbed into how all modern agents work; nobody really invokes it as a distinct technique anymore.
+
+### Working definitions worth using
+
+For internal clarity:
+
+| Term | Definition | Examples |
+|---|---|---|
+| **LLM-enabled workflow** | Predefined graph, some nodes call LLMs, control flow declared by developer | LangGraph apps, Dify, n8n |
+| **Agent** | Loop where the LLM decides control flow at runtime | Claude Code, Cursor, Codex |
+| **Hybrid** | Workflow with an agent embedded in one or more nodes (or vice versa) | Most real production systems |
+
+Ignore "autonomous" and "ReAct" as marker words — too overloaded to carry meaning.
+
+### The bottom line
+
+> The honest distinction isn't *whether LLMs are involved* but *whether the LLM decides the program's control flow*. Workflows put control flow in the graph. Agents put control flow in the model.
+
+By that standard, LangGraph/Dify programs are workflows with LLM nodes, not agents. Claude Code, Cursor, Codex are the genuine article. Be skeptical when someone calls their LangGraph app an "agent" — they're usually using the word the marketing way, not the structural way.
+
+## 7. Takeaways
 
 - The **LangChain ecosystem** has two core building libraries (**LangChain** for linear flows, **LangGraph** for stateful/agentic), one observability product (**LangSmith**), and one deployment product (**LangGraph Platform**). Everything else is packaging.
 - **LangGraph is where the company's strategic weight is going.** For anything beyond a single-shot chain, start there.
-- Agents split into **autonomous** (model decides control flow) and **workflow** (developer decides). Real production systems are usually hybrid.
-- **Famous agent products are autonomous** because models got good enough that the loop became trivial; the value moved to tool design, context, UX — none of which a framework can abstract.
-- **Frameworks dominate workflow agents** because the structure *is* the hard part.
-- **All agents stop.** The difference is whether the stop is declarative (workflow) or emergent (autonomous).
+- The cleanest split is **agent vs. workflow**, by who decides control flow — the model (agent) or the developer (workflow). Real production systems are usually hybrid.
+- **Famous agent products are agents** because models got good enough that the loop became trivial; the value moved to tool design, context, UX — none of which a framework can abstract.
+- **Frameworks dominate workflows** because the structure *is* the hard part.
+- **All programs stop.** The difference is whether the stop is declarative (workflow) or emergent (agent).
+- **The industry's terminology is unreliable.** "AI agent" is mostly marketing. Apply the control-flow test before taking the label at face value.
