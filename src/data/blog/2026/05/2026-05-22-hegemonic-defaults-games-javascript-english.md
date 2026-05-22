@@ -1,6 +1,6 @@
 ---
 title: Hegemonic Defaults — Games, JavaScript, and English
-description: Three media — electronic games, programming languages, and human tongues — share a structural failure: each is dominated by a "good-enough" winner that locked in by network effect, not merit, and the lock-in quietly shrinks what users can imagine.
+description: "Three media — electronic games, programming languages, and human tongues — share a structural failure: each is dominated by a 'good-enough' winner that locked in by network effect, not merit, and the lock-in quietly shrinks what users can imagine."
 pubDatetime: 2026-05-22T02:10:10Z
 tags: [essay, media-theory, games, programming-languages, javascript, linguistics, sapir-whorf, hegemony, software-history]
 ---
