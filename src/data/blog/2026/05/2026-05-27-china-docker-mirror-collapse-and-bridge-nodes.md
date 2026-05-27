@@ -73,15 +73,15 @@ container service**:
 
 ```mermaid
 flowchart TD
-    Start[Need to pull images<br/>from inside mainland China] --> Q1{OK with using Aliyun /<br/>Tencent / Huawei?}
-    Q1 -->|Yes| P1[ACR / TCR / SWR with<br/>upstream sync]
-    Q1 -->|No| Q2{Production fleet<br/>or just dev?}
-    Q2 -->|Dev only| P2[Community mirror<br/>+ accept breakage]
-    Q2 -->|Production| Bridge[Need a bridge node<br/>outside the GFW]
-    Bridge --> P3[Overseas VPS +<br/>registry:2 / Harbor]
-    Bridge --> P4[Cloudflare Worker<br/>proxy]
-    Bridge --> P5[HK leased line /<br/>SD-WAN]
-    Bridge --> P6[Host-level proxy<br/>Shadowsocks/VLESS/<br/>WireGuard]
+    Start["Need to pull images<br/>from inside mainland China"] --> Q1{"OK with using Aliyun /<br/>Tencent / Huawei?"}
+    Q1 -->|Yes| P1["ACR / TCR / SWR with<br/>upstream sync"]
+    Q1 -->|No| Q2{"Production fleet<br/>or just dev?"}
+    Q2 -->|Dev only| P2["Community mirror<br/>+ accept breakage"]
+    Q2 -->|Production| Bridge["Need a bridge node<br/>outside the GFW"]
+    Bridge --> P3["Overseas VPS +<br/>registry:2 / Harbor"]
+    Bridge --> P4["Cloudflare Worker<br/>proxy"]
+    Bridge --> P5["HK leased line /<br/>SD-WAN"]
+    Bridge --> P6["Host-level proxy<br/>Shadowsocks/VLESS/<br/>WireGuard"]
 ```
 
 ### Path A — domestic cloud registry (most production teams)
@@ -127,8 +127,8 @@ flowchart TB
 
     subgraph Bridge["🌉 Bridge node (outside GFW)"]
         direction LR
-        R[Registry mirror<br/>registry:2 / Harbor]
-        P[Network proxy<br/>SOCKS / HTTPS / VPN]
+        R["Registry mirror<br/>registry:2 / Harbor"]
+        P["Network proxy<br/>SOCKS / HTTPS / VPN"]
     end
 
     subgraph Out["🌐 Upstream"]
