@@ -1,6 +1,6 @@
 ---
-title: OAuth, Spotify, and Python: A Practical Learning Path
-description: A practical guide to learning OAuth 2.0 with Spotify, FastAPI, Authlib, refresh tokens, and small Python scripts.
+title: "OAuth, Spotify, and Python: A Practical Learning Path"
+description: "A practical guide to learning OAuth 2.0 with Spotify, FastAPI, Authlib, refresh tokens, and small Python scripts."
 pubDatetime: 2026-05-29T11:33:44Z
 tags: [oauth, spotify, python, fastapi, authlib, api]
 ---
