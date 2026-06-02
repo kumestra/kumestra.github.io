@@ -1,5 +1,5 @@
 ---
-title: Hermes Agent Interfaces: TUI, Bots, and Web Frontends
+title: "Hermes Agent Interfaces: TUI, Bots, and Web Frontends"
 description: A comparison of Hermes Agent's native interfaces and general chat frontends, with a practical rule for choosing where tools and skills should live.
 pubDatetime: 2026-06-02T05:54:01Z
 tags: [hermes-agent, ai-agents, tui, telegram, llm-frontends]
