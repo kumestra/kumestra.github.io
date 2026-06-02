@@ -1,5 +1,5 @@
 ---
-title: Docker Network Basics: Bridges, Names, Ports, and Cleanup
+title: "Docker Network Basics: Bridges, Names, Ports, and Cleanup"
 description: A practical guide to how Docker connects containers, how default and user-defined bridge networks differ, and what happens to networks when containers are removed.
 pubDatetime: 2026-06-02T10:28:30Z
 tags: [docker, networking, containers, devops]
