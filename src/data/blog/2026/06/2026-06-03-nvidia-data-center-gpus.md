@@ -1,5 +1,5 @@
 ---
-title: NVIDIA Data Center GPUs: From Accelerators to AI Factories
+title: "NVIDIA Data Center GPUs: From Accelerators to AI Factories"
 description: A practical overview of how NVIDIA data center GPUs evolved from general accelerators into rack-scale AI systems.
 pubDatetime: 2026-06-03T13:02:21Z
 featured: false
