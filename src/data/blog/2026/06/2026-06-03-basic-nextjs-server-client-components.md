@@ -1,5 +1,5 @@
 ---
-title: Basic Next.js Concepts: Server Components and Client Components
+title: "Basic Next.js Concepts: Server Components and Client Components"
 description: A beginner-friendly explanation of what Next.js adds to React and how Server Components differ from Client Components.
 pubDatetime: 2026-06-03T12:01:33Z
 tags: [nextjs, react, server-components, client-components]
