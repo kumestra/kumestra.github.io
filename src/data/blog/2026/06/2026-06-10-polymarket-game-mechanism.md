@@ -1,43 +1,43 @@
 ---
-title: "The Game Mechanism Behind Polymarket"
-description: "A simple explanation of how binary prediction markets work, why shares pay $1, and how Polymarket differs from a winner-takes-all pool."
+title: "Polymarket 背后的游戏机制"
+description: "用简单方式解释二元预测市场如何运作、为什么每份赢家份额兑换 1 美元，以及 Polymarket 和赢家通吃资金池有什么不同。"
 pubDatetime: 2026-06-10T12:53:33Z
 tags: [polymarket, prediction-markets, trading, market-mechanism]
 ---
 
-## The Core Idea
+## 核心想法
 
-Polymarket is easiest to understand as a market for event outcomes.
+理解 Polymarket 最简单的方法，是把它看成一个交易“事件结果”的市场。
 
-A market asks a question such as:
+一个市场会提出类似这样的问题：
 
 ```text
 Will event X happen by date Y?
 ```
 
-For a simple binary market, there are only two outcomes:
+在最简单的二元市场里，只有两个结果：
 
 ```text
 Yes / A: the event happens
 No / B: the event does not happen
 ```
 
-People do not buy a traditional stock. They buy outcome shares. If the outcome is correct, each winning share can be redeemed for $1. If the outcome is wrong, that share becomes worth $0.
+人们买的不是传统股票，而是某个结果的份额。如果你买的结果是正确的，每一份赢家份额可以兑换 1 美元。如果结果错了，那份份额就变成 0 美元。
 
-That one rule explains most of the game:
+这条规则解释了这个游戏的大部分机制：
 
 ```text
 Winning share  -> $1
 Losing share   -> $0
 ```
 
-So if you buy one Yes share for $0.40 and Yes wins, you receive $1. Your profit is $0.60. If Yes loses, you lose the $0.40 you paid.
+所以，如果你用 0.40 美元买入一份 Yes，最后 Yes 赢了，你会收到 1 美元。你的利润是 0.60 美元。如果 Yes 输了，你就损失买入时支付的 0.40 美元。
 
-## The Simplest Pool Model
+## 最简单的资金池模型
 
-Before looking at Polymarket itself, imagine a simpler game.
+在看 Polymarket 本身之前，可以先想象一个更简单的游戏。
 
-There are two sides, A and B:
+市场里有 A 和 B 两边：
 
 ```text
 Money on A = $10
@@ -45,38 +45,38 @@ Money on B = $30
 Total pool = $40
 ```
 
-If A wins, the people who chose A split the whole $40 pool. If B wins, the people who chose B split the whole $40 pool.
+如果 A 赢，选择 A 的人瓜分整个 40 美元资金池。如果 B 赢，选择 B 的人瓜分整个 40 美元资金池。
 
-In that simplified model, A has 25% of the money:
+在这个简化模型里，A 占全部资金的 25%：
 
 ```text
 A share of pool = 10 / (10 + 30) = 0.25
 ```
 
-So the rough implied price of A is $0.25, and the rough implied price of B is $0.75.
+所以 A 的粗略隐含价格是 0.25 美元，B 的粗略隐含价格是 0.75 美元。
 
-If you put $1 on A in this simplified pool, your expected payout if A wins is:
+如果你在这个简化资金池里向 A 投入 1 美元，那么 A 赢时你的预期返还是：
 
 ```text
 $1 / $0.25 = 4 shares
 4 winning shares x $1 = $4 returned
 ```
 
-That means your $1 comes back as $4 if A wins, giving you $3 profit.
+也就是说，如果 A 赢，你的 1 美元会变成 4 美元，总利润是 3 美元。
 
-This is a useful intuition: when an outcome is priced at $0.25, it behaves like a 4x gross payout if it wins.
+这是一个很有用的直觉：当某个结果价格是 0.25 美元时，如果它赢了，就相当于 4 倍总返还。
 
-## The Formula
+## 基本公式
 
-For a binary outcome share, the basic payout multiple is:
+对二元结果份额来说，基础返还倍数是：
 
 ```text
 gross payout multiple = 1 / share price
 ```
 
-Examples:
+例子：
 
-| Share price | Shares bought with $1 | Return if correct | Profit if correct |
+| 份额价格 | 1 美元可以买到的份额 | 判断正确时返还 | 判断正确时利润 |
 |---:|---:|---:|---:|
 | $0.20 | 5.00 | $5.00 | $4.00 |
 | $0.25 | 4.00 | $4.00 | $3.00 |
@@ -84,44 +84,44 @@ Examples:
 | $0.50 | 2.00 | $2.00 | $1.00 |
 | $0.80 | 1.25 | $1.25 | $0.25 |
 
-The cheaper the share, the bigger the payout if it wins. But it is cheap for a reason: the market currently thinks that outcome is less likely.
+份额越便宜，如果它赢了，返还倍数就越高。但它便宜也有原因：市场当前认为这个结果发生的可能性更低。
 
-## Why Price Looks Like Probability
+## 为什么价格看起来像概率
 
-Because a winning share pays $1, a share price can be read as an implied probability.
+因为每份赢家份额会支付 1 美元，所以份额价格可以被理解成一种隐含概率。
 
-If Yes costs $0.65, the market is roughly saying:
+如果 Yes 的价格是 0.65 美元，市场大致在表达：
 
 ```text
 Yes has about a 65% chance
 No has about a 35% chance
 ```
 
-This does not mean the market is correct. It only means traders are currently willing to buy and sell around that price.
+这不代表市场一定是对的。它只表示交易者目前愿意在这个价格附近买卖。
 
-A good trader is not asking only, "Will this happen?" A good trader is asking:
+好的交易者不只是问：“这件事会发生吗？”更重要的问题是：
 
 ```text
 Is the real probability higher or lower than the current market price?
 ```
 
-If you think an event has a 60% chance, and the Yes share costs $0.40, you may think Yes is underpriced.
+如果你认为某件事有 60% 的概率发生，而 Yes 份额只卖 0.40 美元，你可能会认为 Yes 被低估了。
 
-If you think an event has a 30% chance, and the Yes share costs $0.60, you may think Yes is overpriced.
+如果你认为某件事只有 30% 的概率发生，而 Yes 份额卖 0.60 美元，你可能会认为 Yes 被高估了。
 
-## The Important Difference: Polymarket Is Not Just a Pool
+## 关键区别：Polymarket 不只是一个资金池
 
-The simple pool model says:
+简单资金池模型会说：
 
 ```text
 price of A = money on A / total money
 ```
 
-That is a helpful teaching model, but it is not exactly how Polymarket sets prices.
+这是一个有帮助的教学模型，但它并不是 Polymarket 定价的真实方式。
 
-Polymarket uses an order book. Prices are formed by buyers and sellers placing orders against each other. If someone wants to buy Yes at $0.38 and someone else wants to sell Yes at $0.40, the visible market sits around those orders.
+Polymarket 使用订单簿。价格来自买方和卖方互相挂单、成交的过程。如果有人愿意以 0.38 美元买 Yes，另一个人愿意以 0.40 美元卖 Yes，那么可见市场价格就会围绕这些订单形成。
 
-So the current price is not mechanically calculated from the total money ever placed on A and B. It comes from the best available bids and asks:
+所以，当前价格不是根据历史上投向 A 和 B 的总资金机械计算出来的。它来自当前最好的买价和卖价：
 
 ```text
 Bid = highest price someone is willing to pay
@@ -129,120 +129,120 @@ Ask = lowest price someone is willing to sell for
 Spread = ask - bid
 ```
 
-Example:
+例子：
 
 ```text
 Best bid for Yes = $0.34
 Best ask for Yes = $0.40
 ```
 
-If you buy immediately, you usually pay the ask: $0.40.
+如果你立刻买入，通常要支付卖价，也就是 0.40 美元。
 
-If you sell immediately, you usually receive the bid: $0.34.
+如果你立刻卖出，通常只能拿到买价，也就是 0.34 美元。
 
-The displayed probability might look like the middle, around $0.37, but your real execution price depends on the order book.
+页面显示的概率可能看起来像中间价，大约 0.37 美元，但你的真实成交价格取决于订单簿。
 
-## How Yes and No Shares Are Backed
+## Yes 和 No 份额如何获得抵押支持
 
-Under the hood, a complete Yes/No pair is backed by $1 of collateral.
+在底层机制里，一组完整的 Yes/No 份额由 1 美元抵押品支持。
 
-Conceptually:
+概念上可以这样理解：
 
 ```text
 $1 collateral -> 1 Yes share + 1 No share
 ```
 
-Only one side should win in a normal binary market.
+在正常的二元市场中，最终应该只有一边获胜。
 
-If Yes wins:
+如果 Yes 赢：
 
 ```text
 Yes share -> $1
 No share  -> $0
 ```
 
-If No wins:
+如果 No 赢：
 
 ```text
 Yes share -> $0
 No share  -> $1
 ```
 
-This is why Yes and No prices usually add up to about $1, ignoring spread, fees, and market frictions.
+这就是为什么在忽略买卖价差、费用和市场摩擦的情况下，Yes 和 No 的价格通常会加起来接近 1 美元。
 
-If Yes is around $0.70, No should be around $0.30. If they drift too far from that relationship, traders may arbitrage the difference.
+如果 Yes 大约是 0.70 美元，No 通常应该大约是 0.30 美元。如果两边价格偏离这个关系太远，交易者可能会通过套利把差距拉回来。
 
-## A Concrete Example
+## 一个具体例子
 
-Suppose a market asks:
+假设某个市场的问题是：
 
 ```text
 Will A happen?
 ```
 
-The order book currently lets you buy A at $0.25.
+当前订单簿允许你以 0.25 美元买入 A。
 
-You spend $10:
+你花 10 美元：
 
 ```text
 $10 / $0.25 = 40 A shares
 ```
 
-If A wins:
+如果 A 赢：
 
 ```text
 40 shares x $1 = $40 returned
 Profit = $40 - $10 = $30
 ```
 
-If A loses:
+如果 A 输：
 
 ```text
 40 shares x $0 = $0 returned
 Loss = $10
 ```
 
-So the risk is asymmetric:
+所以风险是不对称的：
 
 ```text
 Maximum loss = the amount you paid
 Maximum payout = number of shares x $1
 ```
 
-You cannot lose more than your purchase cost on a simple long Yes or No position, but you can lose the entire amount.
+在单纯做多 Yes 或 No 的情况下，你最多亏掉买入成本，不会亏超过你支付的金额。但这也意味着你可能损失全部本金。
 
-## What Traders Are Really Playing
+## 交易者真正玩的是哪一层
 
-The game is not only "guess the outcome." It is "find a wrong price."
+这个游戏不只是“猜结果”。更准确地说，它是在“寻找错误价格”。
 
-Imagine Yes is trading at $0.25.
+假设 Yes 的交易价格是 0.25 美元。
 
-If your true estimate is that Yes has a 25% chance, then the price is fair. Over many similar bets, there is no edge before costs and spread.
+如果你真实估计 Yes 的概率就是 25%，那这个价格基本公平。在很多类似交易中，扣除成本和买卖价差之前，你没有明显优势。
 
-If your true estimate is that Yes has a 40% chance, then $0.25 may be attractive.
+如果你真实估计 Yes 的概率是 40%，那么 0.25 美元可能很有吸引力。
 
-If your true estimate is that Yes has only a 10% chance, then $0.25 may be expensive.
+如果你真实估计 Yes 的概率只有 10%，那么 0.25 美元可能就太贵了。
 
-The edge comes from the gap between your probability estimate and the market price:
+优势来自你的概率估计和市场价格之间的差距：
 
 ```text
 edge = your estimated probability - market price
 ```
 
-For a Yes share:
+对 Yes 份额来说：
 
 ```text
 positive edge  -> your probability is higher than price
 negative edge  -> your probability is lower than price
 ```
 
-Of course, the hard part is knowing whether your estimate is better than the market's.
+当然，真正困难的地方在于：你是否真的比市场估得更准。
 
-## Why People Can Exit Before Resolution
+## 为什么可以在结算前退出
 
-You do not always need to wait until the event resolves.
+你不一定要等到事件最终结算。
 
-If you buy Yes at $0.40 and later the market price rises to $0.70, you can sell before the final outcome:
+如果你以 0.40 美元买入 Yes，之后市场价格涨到 0.70 美元，你可以在最终结果出来前卖出：
 
 ```text
 Buy at $0.40
@@ -250,13 +250,13 @@ Sell at $0.70
 Profit = $0.30 per share
 ```
 
-This turns Polymarket into both a prediction game and a trading game. Traders can profit from price movement before the event ends, even if they never hold the share until final settlement.
+这让 Polymarket 同时像预测游戏，也像交易游戏。交易者可以从事件结束前的价格变化中获利，即使他们从来没有持有到最终结算。
 
-But exiting depends on liquidity. A displayed price does not guarantee you can sell a large position at that price. You need buyers on the other side.
+但能不能退出取决于流动性。页面显示的价格不保证你能以那个价格卖出大仓位。你需要另一边有买家。
 
-## The Mental Model
+## 心智模型
 
-A clean mental model for Polymarket is:
+可以这样记住 Polymarket：
 
 ```text
 1. Each market has outcome shares.
@@ -268,11 +268,11 @@ A clean mental model for Polymarket is:
 7. Profit comes from buying probabilities that are too cheap or selling probabilities that are too expensive.
 ```
 
-The pool model is still useful. If A has $10 and B has $30, it is natural to think A is priced around 25%. But in Polymarket, the real trade happens at the price another trader is willing to accept right now.
+资金池模型仍然有用。如果 A 有 10 美元，B 有 30 美元，很自然会觉得 A 的价格大约是 25%。但在 Polymarket 里，真正的交易发生在另一个交易者此刻愿意接受的价格上。
 
-That is the heart of the mechanism: prediction becomes a tradable asset, probability becomes a price, and the final truth turns the winning token into $1.
+这就是这个机制的核心：预测变成可交易资产，概率变成价格，而最终真相会把赢家代币变成 1 美元。
 
-## Sources
+## 来源
 
 - [Polymarket 101](https://docs.polymarket.com/polymarket-101)
 - [Polymarket Prices & Orderbook](https://docs.polymarket.com/concepts/prices-orderbook)
