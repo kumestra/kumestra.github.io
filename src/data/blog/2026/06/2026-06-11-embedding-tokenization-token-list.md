@@ -102,13 +102,13 @@ The model has a learned table called an **embedding matrix**. Each row correspon
 
 If our toy vocabulary has 5 tokens and each embedding has 3 dimensions, the embedding matrix has shape:
 
-\[
+$$
 5 \times 3
-\]
+$$
 
 Here is a complete toy embedding matrix:
 
-\[
+$$
 E =
 \begin{bmatrix}
 0.00 & 0.00 & 0.00 \\
@@ -117,25 +117,25 @@ E =
 0.70 & 0.40 & 0.90 \\
 0.60 & 0.30 & 0.85
 \end{bmatrix}
-\]
+$$
 
 The rows line up with the vocabulary:
 
 | Token ID | Token | Embedding row |
 |---:|-------|---------------|
-| 0 | `<pad>` | \([0.00, 0.00, 0.00]\) |
-| 1 | `I` | \([0.90, 0.10, 0.30]\) |
-| 2 | `like` | \([0.20, 0.80, 0.50]\) |
-| 3 | `cats` | \([0.70, 0.40, 0.90]\) |
-| 4 | `dogs` | \([0.60, 0.30, 0.85]\) |
+| 0 | `<pad>` | `[0.00, 0.00, 0.00]` |
+| 1 | `I` | `[0.90, 0.10, 0.30]` |
+| 2 | `like` | `[0.20, 0.80, 0.50]` |
+| 3 | `cats` | `[0.70, 0.40, 0.90]` |
+| 4 | `dogs` | `[0.60, 0.30, 0.85]` |
 
 The numbers here are invented, but the structure is real. In an actual LLM, the matrix is learned during training and is much larger.
 
 For example, a model might have:
 
-\[
+$$
 100{,}000 \times 4{,}096
-\]
+$$
 
 That means:
 
@@ -152,48 +152,48 @@ I like cats
 
 After tokenization:
 
-\[
+$$
 [1, 2, 3]
-\]
+$$
 
 To embed this sequence, the model performs a row lookup:
 
-\[
+$$
 E[1] =
 \begin{bmatrix}
 0.90 & 0.10 & 0.30
 \end{bmatrix}
-\]
+$$
 
-\[
+$$
 E[2] =
 \begin{bmatrix}
 0.20 & 0.80 & 0.50
 \end{bmatrix}
-\]
+$$
 
-\[
+$$
 E[3] =
 \begin{bmatrix}
 0.70 & 0.40 & 0.90
 \end{bmatrix}
-\]
+$$
 
 The embedded prompt becomes:
 
-\[
+$$
 \begin{bmatrix}
 0.90 & 0.10 & 0.30 \\
 0.20 & 0.80 & 0.50 \\
 0.70 & 0.40 & 0.90
 \end{bmatrix}
-\]
+$$
 
 The shape is:
 
-\[
+$$
 3 \times 3
-\]
+$$
 
 In this toy example:
 
@@ -202,9 +202,9 @@ In this toy example:
 
 In a real model, a prompt with 8,192 tokens and embedding dimension 4,096 would become:
 
-\[
+$$
 8{,}192 \times 4{,}096
-\]
+$$
 
 This is the embedded input matrix the transformer layers operate on.
 
@@ -223,18 +223,18 @@ The embedded prompt matrix is created fresh for each input by selecting rows fro
 
 In notation:
 
-\[
+$$
 \text{token IDs} = [1, 2, 3]
-\]
+$$
 
-\[
+$$
 \text{embedded prompt} =
 \begin{bmatrix}
 E[1] \\
 E[2] \\
 E[3]
 \end{bmatrix}
-\]
+$$
 
 So the token list is not wrong. It is just not the whole story.
 
@@ -391,9 +391,9 @@ text -> token IDs -> embedding lookup -> matrix of vectors
 
 Or:
 
-\[
+$$
 \text{embedded prompt shape} =
 \text{sequence length} \times \text{embedding dimension}
-\]
+$$
 
 So social media is not wrong to talk about "token lists." That is the convenient outer interface. But essentially, once the LLM begins computation, the token list has been transformed into a matrix of vectors.
